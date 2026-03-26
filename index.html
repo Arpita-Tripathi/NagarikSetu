@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NagarikSetu | Government Civic Service Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Merriweather:wght@700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="background-layers" aria-hidden="true">
+    <span class="mesh mesh-a"></span>
+    <span class="mesh mesh-b"></span>
+    <span class="mesh mesh-c"></span>
+  </div>
+
+  <header class="topbar">
+    <div class="brand panel-strong">
+      <div class="brand-icon" aria-hidden="true">NS</div>
+      <div>
+        <p class="brand-tag">Government Of India Service Gateway</p>
+        <h1>NagarikSetu Civic Operations Portal</h1>
+        <p class="brand-sub">Transparent grievance redressal, ward-level planning, and citizen participation.</p>
+      </div>
+    </div>
+
+    <div class="live-strip panel-soft">
+      <p id="liveClock">Now: --</p>
+      <p id="liveWeather">Weather: loading...</p>
+      <p id="liveIssueTicker">Civic pulse: loading...</p>
+    </div>
+
+    <div id="sessionBox" class="session-box panel-soft hidden">
+      <p id="sessionUser">User</p>
+      <div class="session-actions">
+        <button id="notificationBtn" class="btn btn-outline btn-sm" type="button" aria-controls="notificationPanel" aria-expanded="false">
+          Notifications <span id="notificationCount" class="count-badge">0</span>
+        </button>
+        <button id="exportCsvBtn" class="btn btn-outline btn-sm hidden" type="button">Export CSV</button>
+        <button id="logoutBtn" class="btn btn-outline btn-sm" type="button">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="service-banner" role="status">
+    <p><strong>Public Service Notice:</strong> Emergency services: 112 | Water board helpline: 1916 | Municipal complaint desk: 1800-111-555</p>
+  </div>
+
+  <aside id="notificationPanel" class="notification-panel hidden" aria-live="polite">
+    <div class="notification-head">
+      <h3>Notifications</h3>
+      <button id="markNotificationsReadBtn" class="btn btn-outline btn-sm" type="button">Mark all read</button>
+    </div>
+    <div id="notificationList" class="list"></div>
+  </aside>
+
+  <main class="layout">
+    <section id="authSection" class="panel auth-panel">
+      <div class="auth-header">
+        <h2>Secure Role Access</h2>
+        <p>Sign in as citizen or elected representative to access civic services.</p>
+      </div>
+
+      <div class="auth-toggle">
+        <button id="loginTabBtn" class="btn btn-pill active" type="button">Sign In</button>
+        <button id="registerTabBtn" class="btn btn-pill" type="button">Create Account</button>
+      </div>
+
+      <form id="loginForm" class="form-grid">
+        <h3>Account Login</h3>
+        <label>
+          Email
+          <input type="email" id="loginEmail" required placeholder="you@email.com">
+        </label>
+        <label>
+          Password
+          <input type="password" id="loginPassword" required placeholder="Enter your password">
+        </label>
+        <button class="btn btn-primary" type="submit">Login</button>
+      </form>
+
+      <form id="registerForm" class="form-grid hidden">
+        <h3>Create Role-Based Account</h3>
+        <label>
+          Full Name
+          <input type="text" id="registerName" required placeholder="Your full name">
+        </label>
+        <label>
+          Email
+          <input type="email" id="registerEmail" required placeholder="you@email.com">
+        </label>
+        <label>
+          Password
+          <input type="password" id="registerPassword" minlength="6" required placeholder="At least 6 characters">
+        </label>
+        <label>
+          Role
+          <select id="registerRole" required>
+            <option value="citizen">Citizen</option>
+            <option value="politician">Politician</option>
+          </select>
+        </label>
+        <label>
+          City
+          <input type="text" id="registerCity" required placeholder="Ex: Pune">
+        </label>
+        <label>
+          Constituency
+          <input type="text" id="registerConstituency" placeholder="Ex: Pune Central">
+        </label>
+        <button class="btn btn-primary" type="submit">Create Account</button>
+      </form>
+
+      <div class="demo-users">
+        <p>Demo Accounts</p>
+        <p><code>citizen@example.com / citizen123</code></p>
+        <p><code>politician@example.com / leader123</code></p>
+      </div>
+    </section>
+
+    <section id="appSection" class="hidden">
+      <section id="citizenView" class="role-view hidden">
+        <div class="headline-row">
+          <div>
+            <h2>Citizen Dashboard</h2>
+            <p>Report issues, support petitions, vote in polls, and track municipal action with service-level transparency.</p>
+          </div>
+        </div>
+
+        <div class="stats-grid four-col">
+          <article class="stat-card">
+            <p>My Open Issues</p>
+            <strong id="cStatOpen">0</strong>
+          </article>
+          <article class="stat-card">
+            <p>My Petitions</p>
+            <strong id="cStatPetitions">0</strong>
+          </article>
+          <article class="stat-card">
+            <p>Polls Voted</p>
+            <strong id="cStatVotes">0</strong>
+          </article>
+          <article class="stat-card">
+            <p>Meetings Pending</p>
+            <strong id="cStatMeetings">0</strong>
+          </article>
+        </div>
+
+        <nav class="role-tabs" data-role="citizen">
+          <button class="btn btn-pill active" type="button" data-tab-target="c-overview">Overview</button>
+          <button class="btn btn-pill" type="button" data-tab-target="c-issues">Issues</button>
+          <button class="btn btn-pill" type="button" data-tab-target="c-petitions">Petitions & Polls</button>
+          <button class="btn btn-pill" type="button" data-tab-target="c-meetings">Meetings & Projects</button>
+          <button class="btn btn-pill" type="button" data-tab-target="c-assistant">AI Assistant</button>
+        </nav>
+
+        <section id="c-overview" class="tab-panel active">
+          <div class="split-grid">
+            <article class="panel">
+              <h3>City Announcements</h3>
+              <div id="citizenAnnouncementsList" class="list"></div>
+            </article>
+            <article class="panel">
+              <h3>Public Promises</h3>
+              <div id="citizenPromisesList" class="list"></div>
+            </article>
+          </div>
+
+          <article class="panel">
+            <h3>Active Public Projects</h3>
+            <p id="citizenProjectBudgetLine" class="meta-line">Budget snapshot loading...</p>
+            <div id="citizenProjectsList" class="list"></div>
+          </article>
+
+          <article class="panel">
+            <h3>Service-Level Snapshot</h3>
+            <p id="citizenSlaSummary" class="meta-line">SLA overview loading...</p>
+          </article>
+        </section>
+
+        <section id="c-issues" class="tab-panel">
+          <div class="split-grid">
+            <article class="panel">
+              <h3>Report a Civic Issue</h3>
+              <form id="issueForm" class="form-grid">
+                <label>
+                  Title
+                  <input type="text" id="issueTitle" required placeholder="Ex: Broken streetlight on MG Road">
+                </label>
+                <label>
+                  Category
+                  <select id="issueCategory" required>
+                    <option value="Roads">Roads</option>
+                    <option value="Water">Water</option>
+                    <option value="Sanitation">Sanitation</option>
+                    <option value="Safety">Safety</option>
+                    <option value="Healthcare">Healthcare</option>
+                    <option value="Transport">Transport</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </label>
+                <label>
+                  Priority
+                  <select id="issuePriority" required>
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                  </select>
+                </label>
+                <label>
+                  Ward / Area
+                  <input type="text" id="issueWard" placeholder="Ex: Ward 3">
+                </label>
+                <label>
+                  Location
+                  <input type="text" id="issueLocation" required placeholder="Road, lane, or landmark">
+                </label>
+                <label>
+                  Contact Number
+                  <input type="tel" id="issueContact" placeholder="Optional for coordination">
+                </label>
+                <label class="full">
+                  Description
+                  <textarea id="issueDescription" rows="4" required placeholder="Provide details for quick resolution"></textarea>
+                </label>
+                <button class="btn btn-primary" type="submit">Submit Issue</button>
+              </form>
+            </article>
+
+            <article class="panel">
+              <h3>My Issues</h3>
+              <div class="toolbar">
+                <select id="citizenIssueFilter">
+                  <option value="all">All statuses</option>
+                  <option value="open">Open</option>
+                  <option value="in_progress">In Progress</option>
+                  <option value="resolved">Resolved</option>
+                </select>
+                <input type="search" id="citizenIssueSearch" placeholder="Search by ticket/title/category/location">
+              </div>
+              <div id="citizenIssuesList" class="list"></div>
+            </article>
+          </div>
+        </section>
+
+        <section id="c-petitions" class="tab-panel">
+          <div class="split-grid">
+            <article class="panel">
+              <h3>Create Petition</h3>
+              <form id="petitionForm" class="form-grid">
+                <label>
+                  Petition Title
+                  <input type="text" id="petitionTitle" required placeholder="Ex: Add zebra crossing near school gate">
+                </label>
+                <label>
+                  Category
+                  <select id="petitionCategory" required>
+                    <option value="Safety">Safety</option>
+                    <option value="Roads">Roads</option>
+                    <option value="Water">Water</option>
+                    <option value="Sanitation">Sanitation</option>
+                    <option value="Healthcare">Healthcare</option>
+                    <option value="Education">Education</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </label>
+                <label class="full">
+                  Petition Details
+                  <textarea id="petitionDetails" rows="4" required placeholder="Explain the civic need and expected impact"></textarea>
+                </label>
+                <button class="btn btn-primary" type="submit">Publish Petition</button>
+              </form>
+            </article>
+            <article class="panel">
+              <h3>Public Petitions</h3>
+              <div id="citizenPetitionsList" class="list"></div>
+            </article>
+          </div>
+
+          <article class="panel">
+            <h3>Community Polls</h3>
+            <div id="citizenPollsList" class="list"></div>
+          </article>
+        </section>
+
+        <section id="c-meetings" class="tab-panel">
+          <div class="split-grid">
+            <article class="panel">
+              <h3>Request Meeting</h3>
+              <form id="meetingForm" class="form-grid">
+                <label>
+                  Topic
+                  <input type="text" id="meetingTopic" required placeholder="Ex: Ward 3 drainage planning">
+                </label>
+                <label>
+                  Preferred Date
+                  <input type="date" id="meetingDate" required>
+                </label>
+                <label>
+                  Preferred Time
+                  <input type="time" id="meetingTime" required>
+                </label>
+                <label>
+                  Meeting Mode
+                  <select id="meetingMode" required>
+                    <option value="In Person">In Person</option>
+                    <option value="Virtual">Virtual</option>
+                    <option value="Hybrid">Hybrid</option>
+                  </select>
+                </label>
+                <label class="full">
+                  Details
+                  <textarea id="meetingDetails" rows="4" required placeholder="Describe agenda and expected outcomes"></textarea>
+                </label>
+                <button class="btn btn-primary" type="submit">Request Meeting</button>
+              </form>
+            </article>
+            <article class="panel">
+              <h3>My Meeting Requests</h3>
+              <div id="citizenMeetingsList" class="list"></div>
+            </article>
+          </div>
+
+          <article class="panel">
+            <h3>Public Projects & Budget Use</h3>
+            <div id="citizenProjectsExtendedList" class="list"></div>
+          </article>
+
+          <article class="panel">
+            <h3>Live Projects Google Map</h3>
+            <p class="meta-line">Use Google Maps to locate live projects (active status) or switch to broader ongoing work views.</p>
+            <form id="citizenWorkMapForm" class="toolbar four map-search-row">
+              <input type="text" id="citizenWorkMapLocation" placeholder="Ex: Ward 5, Pune" required>
+              <select id="citizenWorkMapScope">
+                <option value="live_projects" selected>Live projects</option>
+                <option value="all_work">All ongoing work</option>
+                <option value="repairs">Repair works only</option>
+              </select>
+              <select id="citizenWorkMapRadius">
+                <option value="2">2 km radius</option>
+                <option value="5" selected>5 km radius</option>
+                <option value="10">10 km radius</option>
+                <option value="20">20 km radius</option>
+              </select>
+              <button class="btn btn-primary" type="submit">Show on Map</button>
+            </form>
+            <div class="map-key-row">
+              <input type="password" id="citizenWorkMapApiKey" placeholder="Optional Google Maps API key (stored in this browser)">
+              <button id="citizenSaveMapKeyBtn" class="btn btn-outline btn-sm" type="button">Save Key</button>
+            </div>
+            <p id="citizenWorkMapStatus" class="meta-line">Search works without a key using OpenStreetMap. Save a key only if you prefer Google Maps.</p>
+            <div id="citizenWorkMapCanvas" class="work-map-canvas" aria-label="Citizen area work map"></div>
+            <div id="citizenWorkMapResults" class="list"></div>
+          </article>
+        </section>
+
+        <section id="c-assistant" class="tab-panel">
+          <article class="panel assistant-panel">
+            <div class="assistant-head">
+              <h3>AI Civic Assistant</h3>
+              <p id="citizenRealtimeLine">Loading live context...</p>
+            </div>
+            <div id="citizenChatWindow" class="chat-window"></div>
+            <form id="citizenChatForm" class="chat-input-row">
+              <input type="text" id="citizenChatInput" placeholder="Ask about issues, petitions, polls, meetings, projects, or weather" required>
+              <button class="btn btn-primary" type="submit">Ask</button>
+            </form>
+          </article>
+        </section>
+      </section>
+
+      <section id="politicianView" class="role-view hidden">
+        <div class="headline-row">
+          <div>
+            <h2>Representative Dashboard</h2>
+            <p>Manage ward operations, publish verified updates, and deliver accountable citizen service.</p>
+          </div>
+        </div>
+
+        <div class="stats-grid four-col">
+          <article class="stat-card">
+            <p>Open Issues</p>
+            <strong id="pStatOpen">0</strong>
+          </article>
+          <article class="stat-card">
+            <p>Pending Petitions</p>
+            <strong id="pStatPetitions">0</strong>
+          </article>
+          <article class="stat-card">
+            <p>Pending Meetings</p>
+            <strong id="pStatMeetings">0</strong>
+          </article>
+          <article class="stat-card">
+            <p>Budget Utilization</p>
+            <strong id="pStatBudget">0%</strong>
+          </article>
+        </div>
+
+        <nav class="role-tabs" data-role="politician">
+          <button class="btn btn-pill active" type="button" data-tab-target="p-overview">Overview</button>
+          <button class="btn btn-pill" type="button" data-tab-target="p-issues">Issue Desk</button>
+          <button class="btn btn-pill" type="button" data-tab-target="p-petitions">Petitions & Polls</button>
+          <button class="btn btn-pill" type="button" data-tab-target="p-meetings">Meetings & Projects</button>
+          <button class="btn btn-pill" type="button" data-tab-target="p-comms">Comms & Promises</button>
+          <button class="btn btn-pill" type="button" data-tab-target="p-assistant">AI Assistant</button>
+        </nav>
+
+        <section id="p-overview" class="tab-panel active">
+          <div class="split-grid">
+            <article class="panel">
+              <h3>High Priority Issues</h3>
+              <div id="politicianOverviewIssues" class="list"></div>
+            </article>
+            <article class="panel">
+              <h3>Awaiting Decisions</h3>
+              <div id="politicianOverviewBacklog" class="list"></div>
+            </article>
+          </div>
+          <article class="panel">
+            <h3>Latest Announcements</h3>
+            <div id="politicianAnnouncementsListOverview" class="list"></div>
+          </article>
+        </section>
+
+        <section id="p-issues" class="tab-panel">
+          <article class="panel">
+            <h3>Issue Command Center</h3>
+            <div class="toolbar three">
+              <select id="politicianIssueStatusFilter">
+                <option value="all">All statuses</option>
+                <option value="open">Open</option>
+                <option value="in_progress">In Progress</option>
+                <option value="resolved">Resolved</option>
+              </select>
+              <select id="politicianIssuePriorityFilter">
+                <option value="all">All priorities</option>
+                <option value="high">High</option>
+                <option value="medium">Medium</option>
+                <option value="low">Low</option>
+              </select>
+              <input type="search" id="politicianIssueSearch" placeholder="Search by ticket/title/category/location">
+            </div>
+            <div id="politicianIssuesList" class="list"></div>
+          </article>
+        </section>
+
+        <section id="p-petitions" class="tab-panel">
+          <div class="split-grid">
+            <article class="panel">
+              <h3>Petition Review</h3>
+              <div id="politicianPetitionsList" class="list"></div>
+            </article>
+            <article class="panel">
+              <h3>Create Community Poll</h3>
+              <form id="pollForm" class="form-grid">
+                <label>
+                  Poll Question
+                  <input type="text" id="pollQuestion" required placeholder="Ex: Which ward service needs budget priority next month?">
+                </label>
+                <label class="full">
+                  Options (comma-separated)
+                  <input type="text" id="pollOptions" required placeholder="Road repair,Water supply,Street lights,Garbage collection">
+                </label>
+                <label>
+                  Poll End Date
+                  <input type="date" id="pollEndDate" required>
+                </label>
+                <button class="btn btn-primary" type="submit">Create Poll</button>
+              </form>
+              <div id="politicianPollsList" class="list"></div>
+            </article>
+          </div>
+        </section>
+
+        <section id="p-meetings" class="tab-panel">
+          <div class="split-grid">
+            <article class="panel">
+              <h3>Meeting Requests</h3>
+              <div id="politicianMeetingsList" class="list"></div>
+            </article>
+            <article class="panel">
+              <h3>Create Public Project</h3>
+              <form id="projectForm" class="form-grid">
+                <label>
+                  Project Title
+                  <input type="text" id="projectTitle" required placeholder="Ex: Ward 3 storm drain upgrade">
+                </label>
+                <label>
+                  Ward/Area
+                  <input type="text" id="projectWard" required placeholder="Ex: Ward 3">
+                </label>
+                <label>
+                  Budget (INR)
+                  <input type="number" min="0" id="projectBudget" required placeholder="Ex: 2500000">
+                </label>
+                <label>
+                  Target Completion
+                  <input type="date" id="projectTargetDate" required>
+                </label>
+                <label class="full">
+                  Project Description
+                  <textarea id="projectDescription" rows="3" required placeholder="Scope, timeline, and expected impact"></textarea>
+                </label>
+                <button class="btn btn-primary" type="submit">Create Project</button>
+              </form>
+              <div id="politicianProjectsList" class="list"></div>
+            </article>
+          </div>
+
+          <article class="panel">
+            <h3>Live Projects Intelligence Map</h3>
+            <p class="meta-line">Locate live projects (active status) or switch to all ongoing work and repair overlays.</p>
+            <form id="politicianWorkMapForm" class="toolbar four map-search-row">
+              <input type="text" id="politicianWorkMapLocation" placeholder="Ex: Shivajinagar, Pune" required>
+              <select id="politicianWorkMapScope">
+                <option value="live_projects" selected>Live projects</option>
+                <option value="all_work">All ongoing work</option>
+                <option value="repairs">Repair works only</option>
+              </select>
+              <select id="politicianWorkMapRadius">
+                <option value="2">2 km radius</option>
+                <option value="5" selected>5 km radius</option>
+                <option value="10">10 km radius</option>
+                <option value="20">20 km radius</option>
+              </select>
+              <button class="btn btn-primary" type="submit">Show on Map</button>
+            </form>
+            <div class="map-key-row">
+              <input type="password" id="politicianWorkMapApiKey" placeholder="Optional Google Maps API key (stored in this browser)">
+              <button id="politicianSaveMapKeyBtn" class="btn btn-outline btn-sm" type="button">Save Key</button>
+            </div>
+            <p id="politicianWorkMapStatus" class="meta-line">Search works without a key using OpenStreetMap. Save a key only if you prefer Google Maps.</p>
+            <div id="politicianWorkMapCanvas" class="work-map-canvas" aria-label="Politician area work map"></div>
+            <div id="politicianWorkMapResults" class="list"></div>
+          </article>
+        </section>
+
+        <section id="p-comms" class="tab-panel">
+          <div class="split-grid">
+            <article class="panel">
+              <h3>Announcements</h3>
+              <form id="announcementForm" class="form-grid">
+                <label class="full">
+                  New Public Update
+                  <textarea id="announcementMessage" rows="3" required placeholder="Share updates on civic work and timelines"></textarea>
+                </label>
+                <label>
+                  Priority
+                  <select id="announcementPriority" required>
+                    <option value="normal">Normal</option>
+                    <option value="important">Important</option>
+                    <option value="urgent">Urgent</option>
+                  </select>
+                </label>
+                <button class="btn btn-primary" type="submit">Publish Update</button>
+              </form>
+              <div id="politicianAnnouncementsList" class="list"></div>
+            </article>
+            <article class="panel">
+              <h3>Promises Tracker</h3>
+              <form id="promiseForm" class="form-grid">
+                <label>
+                  Promise Title
+                  <input type="text" id="promiseTitle" required placeholder="Ex: 24x7 water supply in Ward 4">
+                </label>
+                <label>
+                  Target Date
+                  <input type="date" id="promiseDate" required>
+                </label>
+                <label class="full">
+                  Details
+                  <textarea id="promiseDetails" rows="3" required placeholder="Scope, milestones, and accountability notes"></textarea>
+                </label>
+                <button class="btn btn-primary" type="submit">Add Promise</button>
+              </form>
+              <div id="politicianPromisesList" class="list"></div>
+            </article>
+          </div>
+        </section>
+
+        <section id="p-assistant" class="tab-panel">
+          <article class="panel assistant-panel">
+            <div class="assistant-head">
+              <h3>AI Governance Assistant</h3>
+              <p id="politicianRealtimeLine">Loading live context...</p>
+            </div>
+            <div id="politicianChatWindow" class="chat-window"></div>
+            <form id="politicianChatForm" class="chat-input-row">
+              <input type="text" id="politicianChatInput" placeholder="Ask for priorities, petition strategy, polls, meetings, projects, or weather-aware plans" required>
+              <button class="btn btn-primary" type="submit">Ask</button>
+            </form>
+          </article>
+        </section>
+      </section>
+    </section>
+  </main>
+
+  <div id="toastHost" class="toast-host"></div>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
